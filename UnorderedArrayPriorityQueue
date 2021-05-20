@@ -1,0 +1,152 @@
+/**
+ Program 1
+ An unordered array that implements the priority queue interface.
+ CS310
+ 20-February-2020
+ @author Abdullahi Mohamed cssc1244
+ */
+package data_structures;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.lang.*;
+
+public class UnorderedArrayPriorityQueue <E extends Comparable<E>> implements PriorityQueue<E> {
+
+    E[] uadata;
+    int counter = 0;
+    int position = 0;
+
+    @SuppressWarnings("unchecked")
+    public UnorderedArrayPriorityQueue() {
+        uadata = (E[]) new Comparable[DEFAULT_MAX_CAPACITY];
+    }
+
+    @SuppressWarnings("unchecked")
+    public UnorderedArrayPriorityQueue(int length) {
+        uadata = (E[]) new Comparable[length];
+    }
+
+
+    public boolean insert(E object) {
+        if (isFull()) {
+            return false;
+        }
+        else {
+            uadata[counter] = object;
+            counter++;
+            return true;
+        }
+    }
+
+    public E remove() {
+        if (isEmpty())
+            return null;
+        int index = 0;
+        E hiprio = uadata[0];
+        for (int i = 1; i < counter; i++) {
+            if (uadata[i].compareTo(hiprio) < 0) {
+                index = i;
+                hiprio = uadata[index];
+            }
+        }
+        for (int i = index; i < counter - 1; i++) {
+            uadata[i] = uadata[i + 1];
+        }
+        counter--;
+        return hiprio;
+    }
+
+
+    public boolean delete(E obj) {
+        if (isEmpty())
+            return false;
+
+        while (contains(obj)) {
+            int position = 0;
+            for (int i = 0; i < counter; i++) {
+                if (uadata[i].compareTo(obj) == 0) {
+                    position = i;
+                }
+            }
+            while (uadata[position].compareTo(obj) == 0) {
+                for (int i = position; i < counter - 1; i++) {
+                    uadata[i] = uadata[i + 1];
+                }
+                counter--;
+                if (position != 0) {
+                    position--;
+                }
+            }
+        }
+        return true;
+    }
+
+    public E peek() {
+        if (isEmpty())
+            return null;
+        int index = 0;
+        E hiprior = uadata[0];
+        for (int i = 1; i < counter; i++) {
+            if (uadata[i].compareTo(hiprior) < 0) {
+                index = i;
+                hiprior = uadata[index];
+            }
+        }
+        return hiprior;
+    }
+
+    public boolean contains(E obj) {
+        for (int i = 0; i < counter; i++) {
+            if (uadata[i].compareTo(obj) == 0)
+                return true;
+        }
+        return false;
+    }
+
+    public int size() {
+        return counter;
+    }
+
+    public void clear() {
+        for (position = 0; position < counter; position++) {
+            uadata[position] = null;
+            counter = 0;
+        }
+    }
+
+    public boolean isEmpty() {
+        if (counter == 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean isFull() {
+        if (counter == uadata.length) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public Iterator<E> iterator() {
+        return new Ihelp();
+    }
+
+    public class Ihelp<E> implements Iterator {
+        int index = 0;
+
+        public boolean hasNext() {
+            return (index < counter);
+        }
+
+        public E next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            return (E) uadata[index++];
+        }
+
+    }
+}
