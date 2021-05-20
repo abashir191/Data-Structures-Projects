@@ -1,0 +1,215 @@
+/**
+ Program 3
+ CS310
+ 9-April-2020
+ @author Abdullahi Mohamed cssc1244
+ */
+package data_structures;
+
+import java.util.ConcurrentModificationException;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+public class BinaryHeapPriorityQueue<E extends Comparable<E>> implements PriorityQueue<E>{
+
+    Wrapper<E>[] BinaryH;
+
+    int numitems;
+    long numEntry, modcount;
+
+    public BinaryHeapPriorityQueue() {
+
+        this(DEFAULT_MAX_CAPACITY);
+    }
+
+    @SuppressWarnings("unchecked")
+    public BinaryHeapPriorityQueue(int length) {
+        numitems = 0;
+        numEntry = 0;
+        BinaryH = new Wrapper[length];
+    }
+
+    @SuppressWarnings("hiding")
+    protected class Wrapper<E extends Comparable<E>> implements Comparable<Wrapper<E>> {
+        long num;
+        E data;
+
+        public Wrapper(E obj) {
+            num = numEntry++;
+            data = obj;
+        }
+
+        public int compareTo(Wrapper<E> object) {
+            if (((Comparable<E>) data).compareTo(object.data) == 0) {
+
+                return (int) (num - object.num);
+            }
+            return ((Comparable<E>) data).compareTo(object.data);
+        }
+
+    }
+
+    public boolean insert(E object) {
+        if (isFull()) {
+            return false;
+        }
+        BinaryH[numitems] = new Wrapper<E>(object);
+        modcount++;
+        numitems++;
+        trickleup(numitems-1);
+        return true;
+    }
+
+
+
+    private void trickleup(int Index) {
+
+        int ParentIndex = (Index - 1) >> 1;
+        Wrapper<E> value = BinaryH[Index];
+        while ((ParentIndex >= 0) && (value.compareTo(BinaryH[ParentIndex]) < 0)) {
+            BinaryH[Index] = BinaryH[ParentIndex];
+            Index = ParentIndex;
+            ParentIndex = (ParentIndex - 1) >> 1;
+        }
+        BinaryH[Index] = value;
+    }
+
+    private void trickledown(int index) {
+        int child = nextChild(index);
+        while ((child != -1) && (BinaryH[index].compareTo(BinaryH[child]) < 0) && (BinaryH[child].compareTo(BinaryH[numitems - 1]) < 0)) {
+            BinaryH[index] = BinaryH[child];
+            index = child;
+            child = nextChild(index);
+
+        }
+        BinaryH[index] = BinaryH[numitems - 1];
+    }
+
+    private int nextChild(int curr) {
+        int left = (curr << 1) + 1;
+        int right = left + 1;
+
+        if (right < numitems) {
+            if (BinaryH[left].compareTo(BinaryH[right]) < 0) {
+                return left;
+            }
+            return right;
+        }
+        if (left < numitems) {
+            return left;
+        }
+        return -1;
+    }
+
+    public E remove() {
+        if (isEmpty()) {
+            return null;
+        }
+        E tmp = BinaryH[0].data;
+        trickledown(0);
+        modcount++;
+        numitems--;
+        return tmp;
+    }
+
+    public boolean delete(E obj) {
+        if (isEmpty()) {
+            return false;
+        }
+
+        for(int i=0;i<numitems;i++) {
+            if((BinaryH[i].data).compareTo(obj)==0) {
+                trickledown(i);
+                trickleup(i);
+                numitems--;
+                modcount++;
+                i--;
+            }
+        }
+        return true;
+    }
+
+    public E peek() {
+        if (isEmpty()) {
+            return null;
+        }
+        return BinaryH[0].data;
+    }
+
+    public boolean contains(E obj) {
+        if (isEmpty()) {
+            return false;
+        }
+        for (int i = 0; i < numitems; i++) {
+            if (BinaryH[i].data.compareTo(obj) == 0)
+                return true;
+        }
+        return false;
+    }
+
+    public int size() {
+        return numitems;
+    }
+
+    public void clear() {
+        int here;
+        for (here = 0; here < BinaryH.length; here++)
+            BinaryH[here] = null;
+        numitems = 0;
+
+
+    }
+
+    public boolean isEmpty() {
+        return numitems == 0;
+    }
+
+    public boolean isFull() {
+        if (numitems == BinaryH.length) {
+            return true;
+        }
+        return false;
+    }
+
+    public Iterator<E> iterator() {
+
+        return new Iterhelp();
+    }
+
+    public class Iterhelp implements Iterator<E> {
+        int index;
+        long counter;
+
+        public Iterhelp() {
+            index = 0;
+            counter = modcount;
+        }
+
+        public boolean hasNext() {
+            if (modcount != counter) {
+                throw new ConcurrentModificationException();
+
+            }
+            return (index < numitems);
+        }
+
+        public E next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            return BinaryH[index++].data;
+        }
+
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+
+    }
+    public static void main(String[] args) {
+
+        // returns the current time in milliseconds
+        System.out.print("Current Time in milliseconds = ");
+        System.out.println(System.currentTimeMillis());
+    }
+
+}
