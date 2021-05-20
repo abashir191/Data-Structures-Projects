@@ -1,0 +1,66 @@
+/**
+ Program 4
+ CS310
+ 3-May-2020
+ @author Abdullahi Mohamed cssc1244
+ */
+
+package data_structures;
+import java.util.TreeMap;
+import java.util.Map.Entry;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.ConcurrentModificationException;
+
+
+public class BalancedTreeDictionary<K extends Comparable<K>,V> implements DictionaryADT<K,V> {
+
+    TreeMap<K, V> tree;
+
+    public BalancedTreeDictionary() {
+        tree = new TreeMap<K, V>();
+    }
+
+    public boolean put(K key, V value) {
+        return tree.put(key, value) == null;
+    }
+
+    public boolean delete(K key) {
+        return (tree.remove(key) != null);
+    }
+
+    public V getValue(K key) {
+        return tree.get(key);
+    }
+
+    public K getKey(V value) {
+        for (Entry<K, V> X : tree.entrySet())
+            if (((Comparable<V>) value).compareTo(X.getValue()) == 0)
+                return X.getKey();
+        return null;
+    }
+
+    public int size() {
+        return tree.size();
+    }
+
+    public boolean isFull() {
+        return false;
+    }
+
+    public boolean isEmpty() {
+        return tree.isEmpty();
+    }
+
+    public void clear() {
+        tree.clear();
+    }
+
+    public Iterator<K> keys() {
+        return tree.navigableKeySet().iterator();
+    }
+
+    public Iterator<V> values() {
+        return tree.values().iterator();
+    }
+}
